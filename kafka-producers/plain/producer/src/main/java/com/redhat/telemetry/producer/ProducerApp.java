@@ -15,16 +15,49 @@ public class ProducerApp {
         Properties props = new Properties();
 
         // TODO: configure the bootstrap server
+props.put(
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            " my-cluster-kafka-bootstrap-iazhud-kafka-cluster.apps.na46a.prod.ole.redhat.com:443" 
+    );
 
-        // TODO: configure the key and value serializers
+    // TODO: configure the key and value serializers
+    props.put(
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+            "org.apache.kafka.common.serialization.StringSerializer" 
+    );
+    props.put(
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+            "org.apache.kafka.common.serialization.IntegerSerializer" 
+    );
 
-        // TODO: configure the SSL connection
+    // TODO: configure the SSL connection
+    props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL"); 
+    props.put(
+            SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG,
+            "C:/Users/LENOVO/amq-broker-7.7.0-bin/amq-broker-7.7.0/examples/features/standard/ssl-enabled-crl-mqtt/src/main/resources/truststore.jks" 
+    );
+    props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "password"); 
 
         return props;
     }
 
     public static void main(String[] args) {
-        // TODO: Implement the Kafka producer
+        Random random = new Random(); 
+    Producer<Void,Integer> producer = new KafkaProducer<>( 
+             configureProperties()
+    );
+
+    for (int i = 0; i < 10; i++) { 
+        ProducerRecord<Void, Integer> record = new ProducerRecord<>( 
+                "total-connected-devices", 
+                random.nextInt(100) 
+        );
+
+        producer.send(record); 
+        printRecord(record);
+    }
+
+    producer.close(); 
     }
 
     private static void printRecord(ProducerRecord record) {
